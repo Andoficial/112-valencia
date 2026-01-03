@@ -5,13 +5,14 @@ import urllib.parse
 
 app = Flask(__name__)
 
+# ================== CONFIGURACIÓN ==================
 CLIENT_ID = "1457002138868777163"
 CLIENT_SECRET = "6ETxm64ga7P7ZPtKpWIEShYtXyyaykcI"
 REDIRECT_URI = "https://andoficial.github.io/112-valencia/callback"
 
-# URL de tu frontend a donde quieres mandar los datos
-FRONTEND_URL = "https://andoficial.github.io/112-valencia/dashboard.html"  # pon tu página de dashboard
-
+# URL de tu dashboard en GitHub Pages donde recibirás los datos
+FRONTEND_URL = "https://andoficial.github.io/112-valencia/dashboard.html"
+# ====================================================
 
 @app.route("/")
 def home():
@@ -20,11 +21,12 @@ def home():
 
 @app.route("/auth/discord")
 def discord_auth():
+    # 1️⃣ Recoger el "code" que manda Discord
     code = request.args.get("code")
     if not code:
         return "No se recibió ningún code", 400
 
-    # 1️⃣ Intercambiar code por access_token
+    # 2️⃣ Intercambiar el code por un access_token
     data = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
@@ -48,13 +50,13 @@ def discord_auth():
 
     access_token = token["access_token"]
 
-    # 2️⃣ Obtener datos del usuario
+    # 3️⃣ Obtener los datos del usuario
     user = requests.get(
         "https://discord.com/api/users/@me",
         headers={"Authorization": f"Bearer {access_token}"}
     ).json()
 
-    # 3️⃣ Redirigir al frontend con los datos como query params
+    # 4️⃣ Redirigir al frontend con los datos como query params
     params = {
         "id": user.get("id"),
         "username": user.get("username"),
@@ -67,5 +69,6 @@ def discord_auth():
 
 
 if __name__ == "__main__":
+    # Render asigna el puerto en la variable PORT
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port)="0.0.0.0", port=port)
