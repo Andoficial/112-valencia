@@ -1,11 +1,12 @@
-from flask import Flask, request, redirect, jsonify
+import os
+from flask import Flask, request, jsonify
 import requests
 
 app = Flask(__name__)
 
 CLIENT_ID = "1457002138868777163"
 CLIENT_SECRET = "6ETxm64ga7P7ZPtKpWIEShYtXyyaykcI"
-REDIRECT_URI = "https://andoficial.github.io/112-valencia/"
+REDIRECT_URI = "https://andoficial.github.io/112-valencia/callback"
 
 
 @app.route("/")
@@ -16,7 +17,6 @@ def home():
 @app.route("/auth/discord")
 def discord_auth():
     code = request.args.get("code")
-
     if not code:
         return "No se recibió ningún code", 400
 
@@ -50,15 +50,13 @@ def discord_auth():
     # Obtener datos del usuario
     user = requests.get(
         "https://discord.com/api/users/@me",
-        headers={
-            "Authorization": f"Bearer {access_token}"
-        }
+        headers={"Authorization": f"Bearer {access_token}"}
     ).json()
 
     return jsonify(user)
 
 
 if __name__ == "__main__":
-    # Render te da el puerto en la variable PORT
+    # Render asigna el puerto en la variable PORT
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
