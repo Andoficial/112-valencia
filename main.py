@@ -5,16 +5,22 @@ app = Flask(__name__)
 
 CLIENT_ID = "1457002138868777163"
 CLIENT_SECRET = "6ETxm64ga7P7ZPtKpWIEShYtXyyaykcI"
-REDIRECT_URI = "https://andoficial.github.io/112-valencia/callback"
+REDIRECT_URI = "https://andoficial.github.io/112-valencia/"
+
+
+@app.route("/")
+def home():
+    return "Todo OK 😎 — Backend funcionando"
 
 
 @app.route("/auth/discord")
 def discord_auth():
-
     code = request.args.get("code")
+
     if not code:
         return "No se recibió ningún code", 400
 
+    # Intercambiar el code por un access token
     data = {
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
@@ -24,24 +30,35 @@ def discord_auth():
         "scope": "identify"
     }
 
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
 
-    token = requests.post(
+    token_response = requests.post(
         "https://discord.com/api/oauth2/token",
         data=data,
         headers=headers
-    ).json()
+    )
+
+    token = token_response.json()
 
     if "access_token" not in token:
         return jsonify(token), 400
 
+    access_token = token["access_token"]
+
+    # Obtener datos del usuario
     user = requests.get(
         "https://discord.com/api/users/@me",
-        headers={"Authorization": f"Bearer {token['access_token']}"}
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
     ).json()
 
     return jsonify(user)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    # Render te da el puerto en la variable PORT
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
