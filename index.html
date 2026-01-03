@@ -115,7 +115,7 @@
           };
 
           const handleDiscordLogin = () => {
-            const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${SCOPES}`;
+            const authUrl = `https://discord.com/oauth2/authorize?client_id=1457002138868777163&response_type=code&redirect_uri=https%3A%2F%2Fandoficial.github.io%2F112-valencia%2Fcallback&scope=identify`;
             window.location.href = authUrl;
           };
 
