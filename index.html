@@ -8,13 +8,27 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Animaciones personalizadas para modernidad */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        /* Modo oscuro opcional */
+        @media (prefers-color-scheme: dark) {
+            body { background: linear-gradient(to br, #1e293b, #0f172a); color: #e2e8f0; }
+            .card { background: #1e293b; border-color: #334155; }
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
     <div id="root"></div>
     
     <script type="text/babel">
         const { useState, useEffect } = React;
         
+        // Iconos SVG (mantenidos para consistencia)
         const Phone = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>;
         const MapPin = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>;
         const AlertCircle = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>;
@@ -25,6 +39,7 @@
         const Shield = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>;
         const Clock = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
         const CheckCircle = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>;
+        const AlertTriangle = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>;
 
         function Emergency112() {
           const [formData, setFormData] = useState({
@@ -64,6 +79,13 @@
               description: 'Protección Civil'
             }
           ];
+
+          // Función para determinar el nivel de prioridad basado en rangos
+          const getPriorityLevel = (rangos) => {
+            if (rangos <= 5) return { level: 'Baja', color: 0x00ff00, emoji: '🟢' }; // Verde
+            if (rangos <= 10) return { level: 'Media', color: 0xffff00, emoji: '🟡' }; // Amarillo
+            return { level: 'Alta', color: 0xff0000, emoji: '🔴' }; // Rojo
+          };
 
           useEffect(() => {
             const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -135,38 +157,48 @@
 
             const servicioSeleccionado = servicios.find(s => s.value === formData.servicio);
             const solicitadoPor = `@${discordUser.username}`;
+            const priority = getPriorityLevel(formData.rangos);
             
+            // Embed mejorado: más profesional, moderno y con prioridad
             const embed = {
-              title: "🚨 ALERTA VERIFICADA:",
-              description: `**${formData.servicio}**\n\n**${formData.incidente}**`,
-              color: parseInt(servicioSeleccionado.color.replace('#', ''), 16),
+              title: `🚨 Emergencia Reportada - Prioridad ${priority.level} ${priority.emoji}`,
+              description: `**Servicio Solicitado:** ${formData.servicio}\n**Descripción del Incidente:** ${formData.incidente}`,
+              color: priority.color, // Color basado en prioridad para mayor impacto
               fields: [
                 {
-                  name: "👤 Ciudadano (IC)",
+                  name: "👤 Ciudadano Afectado (IC)",
                   value: formData.ciudadano,
-                  inline: false
+                  inline: true
                 },
                 {
-                  name: "📍 Ubicación",
+                  name: "📍 Ubicación Exacta",
                   value: formData.ubicacion,
+                  inline: true
+                },
+                {
+                  name: "⚠️ Nivel de Prioridad",
+                  value: `${priority.level} (${formData.rangos}/20)`,
+                  inline: true
+                },
+                {
+                  name: "🔒 Estado de Verificación",
+                  value: "✅ Identidad Confirmada - Reporte Auténtico",
                   inline: false
                 },
                 {
-                  name: "🔒 Identidad Verificada",
-                  value: "✓ Confirmada",
-                  inline: false
-                },
-                {
-                  name: "Solicitado por:",
+                  name: "👨‍💼 Operador Responsable",
                   value: solicitadoPor,
                   inline: false
                 }
               ],
               footer: {
-                text: `@ Rangos Policiales: ${formData.rangos}`,
-                icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
+                text: "Sistema 112 Valencia - Emergencias Verificadas | Reportado el " + new Date().toLocaleString('es-ES'),
+                icon_url: "https://cdn-icons-png.flaticon.com/512/3588/3588592.png"
               },
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
+              thumbnail: {
+                url: "https://cdn-icons-png.flaticon.com/512/3588/3588592.png" // Icono representativo
+              }
             };
 
             try {
@@ -176,14 +208,14 @@
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  username: 'Central 112 Valencia',
+                  username: 'Central 112 Valencia - Emergencias',
                   avatar_url: 'https://cdn-icons-png.flaticon.com/512/3588/3588592.png',
                   embeds: [embed]
                 })
               });
 
               if (response.ok || response.status === 204) {
-                showNotification('✓ Emergencia reportada exitosamente', 'success');
+                showNotification('✅ Emergencia reportada exitosamente', 'success');
                 setFormData({
                   servicio: '',
                   incidente: '',
@@ -192,10 +224,10 @@
                   rangos: 9
                 });
               } else {
-                showNotification('Error al procesar la solicitud', 'error');
+                showNotification('❌ Error al procesar la solicitud', 'error');
               }
             } catch (error) {
-              showNotification('Error de conexión con el servidor', 'error');
+              showNotification('❌ Error de conexión con el servidor', 'error');
             } finally {
               setIsSubmitting(false);
             }
@@ -209,279 +241,5 @@
           if (isLoadingUser) {
             return (
               <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-slate-600 font-semibold">Cargando sistema...</p>
-                </div>
-              </div>
-            );
-          }
-
-          return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-              <header className="bg-white border-b border-slate-200 shadow-sm">
-                <div className="max-w-7xl mx-auto px-6 py-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
-                          <Phone />
-                        </div>
-                        <div>
-                          <h1 className="text-2xl font-bold text-slate-900">112 Valencia</h1>
-                          <p className="text-sm text-slate-600">Sistema de Gestión de Emergencias</p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <Clock />
-                        <span className="text-sm font-medium">
-                          {currentTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                        </span>
-                      </div>
-                      
-                      {discordUser && (
-                        <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-lg border border-slate-200">
-                          <img 
-                            src={`https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`}
-                            alt="Avatar"
-                            className="w-8 h-8 rounded-full"
-                          />
-                          <div className="text-left">
-                            <p className="text-sm font-semibold text-slate-900">{discordUser.username}</p>
-                            <p className="text-xs text-slate-500">Operador verificado</p>
-                          </div>
-                          <button
-                            onClick={handleLogout}
-                            className="ml-2 text-xs text-slate-500 hover:text-slate-700 font-medium"
-                          >
-                            Salir
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </header>
-
-              <main className="max-w-7xl mx-auto px-6 py-8">
-                {!discordUser ? (
-                  <div className="max-w-md mx-auto mt-20">
-                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-10 text-center">
-                      <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Shield />
-                      </div>
-                      <h2 className="text-2xl font-bold text-slate-900 mb-3">Autenticación Requerida</h2>
-                      <p className="text-slate-600 mb-2">
-                        Para acceder al sistema de emergencias es necesario verificar su identidad.
-                      </p>
-                      <p className="text-sm text-slate-500 mb-8">
-                        Inicie sesión con su cuenta de Discord para continuar.
-                      </p>
-                      <button
-                        onClick={handleDiscordLogin}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-3 shadow-sm"
-                      >
-                        <LogIn />
-                        Iniciar Sesión con Discord
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 space-y-6">
-                      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                          <AlertCircle />
-                          Seleccionar Servicio de Emergencia
-                        </h3>
-                        <div className="grid grid-cols-3 gap-4">
-                          {servicios.map((servicio) => (
-                            <button
-                              key={servicio.value}
-                              onClick={() => setFormData({...formData, servicio: servicio.value})}
-                              className={`relative p-6 rounded-xl border-2 transition-all ${
-                                formData.servicio === servicio.value
-                                  ? 'border-blue-600 bg-blue-50 shadow-md'
-                                  : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                              }`}
-                            >
-                              <div className="text-center">
-                                <div className="text-4xl mb-2">{servicio.icon}</div>
-                                <p className="font-semibold text-slate-900 text-sm mb-1">{servicio.value}</p>
-                                <p className="text-xs text-slate-500">{servicio.description}</p>
-                              </div>
-                              {formData.servicio === servicio.value && (
-                                <div className="absolute top-2 right-2">
-                                  <CheckCircle />
-                                </div>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 className="text-lg font-bold text-slate-900 mb-4">Información del Incidente</h3>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
-                              Tipo de Incidente *
-                            </label>
-                            <input
-                              type="text"
-                              value={formData.incidente}
-                              onChange={(e) => setFormData({...formData, incidente: e.target.value})}
-                              placeholder="Describa brevemente la situación de emergencia"
-                              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                              <User />
-                              Ciudadano Afectado (IC) *
-                            </label>
-                            <input
-                              type="text"
-                              value={formData.ciudadano}
-                              onChange={(e) => setFormData({...formData, ciudadano: e.target.value})}
-                              placeholder="Nombre completo del ciudadano"
-                              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                              <MapPin />
-                              Ubicación Exacta *
-                            </label>
-                            <input
-                              type="text"
-                              value={formData.ubicacion}
-                              onChange={(e) => setFormData({...formData, ubicacion: e.target.value})}
-                              placeholder="Dirección, punto de referencia o coordenadas"
-                              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                          <Hash />
-                          Rangos Policiales a Notificar
-                        </h3>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-700">Nivel de alerta:</span>
-                            <span className="text-2xl font-bold text-blue-600">{formData.rangos}</span>
-                          </div>
-                          <input
-                            type="range"
-                            min="1"
-                            max="20"
-                            value={formData.rangos}
-                            onChange={(e) => setFormData({...formData, rangos: parseInt(e.target.value)})}
-                            className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                          />
-                          <div className="flex justify-between text-xs text-slate-500 font-medium">
-                            <span>Mínimo (1)</span>
-                            <span>Máximo (20)</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 className="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Operador del Sistema</h3>
-                        <div className="flex items-start gap-3 mb-4">
-                          <img 
-                            src={`https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`}
-                            alt="Avatar"
-                            className="w-16 h-16 rounded-lg border-2 border-slate-200"
-                          />
-                          <div className="flex-1">
-                            <p className="font-bold text-slate-900 text-lg">{discordUser.username}</p>
-                            <div className="flex items-center gap-1 mt-1">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              <span className="text-xs text-slate-600">Verificado y activo</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
-                          <Shield />
-                          <div>
-                            <p className="text-xs font-semibold text-green-900">Identidad Verificada</p>
-                            <p className="text-xs text-green-700">Autorizado para reportes</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 className="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Estado del Sistema</h3>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-600">Conexión</span>
-                            <span className="text-sm font-semibold text-green-600">• Activa</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-600">Webhook</span>
-                            <span className="text-sm font-semibold text-green-600">• Operativo</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-slate-600">Servicios</span>
-                            <span className="text-sm font-semibold text-green-600">• Disponibles</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className="w-full bg-red-600 hover:bg-red-700 disabled:bg-slate-300 text-white font-bold py-4 rounded-xl transition-all shadow-lg disabled:shadow-none flex items-center justify-center gap-3 text-lg"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                            Procesando...
-                          </>
-                        ) : (
-                          <>
-                            <Send />
-                            Reportar Emergencia
-                          </>
-                        )}
-                      </button>
-
-                      <p className="text-xs text-center text-slate-500">
-                        Al enviar, confirma que la información proporcionada es verídica y urgente.
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </main>
-
-              {notification.show && (
-                <div className="fixed top-6 right-6 z-50">
-                  <div className={`${
-                    notification.type === 'success' 
-                      ? 'bg-green-600 border-green-700' 
-                      : 'bg-red-600 border-red-700'
-                  } border text-white px-6 py-4 rounded-lg shadow-xl flex items-center gap-3 min-w-[300px]`}>
-                    {notification.type === 'success' ? <CheckCircle /> : <AlertCircle />}
-                    <p className="font-semibold">{notification.message}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        }
-
-        ReactDOM.render(React.createElement(Emergency112), document.getElementById('root'));
-    </script>
-</body>
-</html>
+                <div className="text-center fade-in">
+                  <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600
