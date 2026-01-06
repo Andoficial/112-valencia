@@ -80,7 +80,7 @@
             }
           ];
 
-          // Función para determinar el nivel de prioridad basado en rangos
+          // Nueva función para determinar el nivel de prioridad basado en rangos
           const getPriorityLevel = (rangos) => {
             if (rangos <= 5) return { level: 'Baja', color: 0x00ff00, emoji: '🟢' }; // Verde
             if (rangos <= 10) return { level: 'Media', color: 0xffff00, emoji: '🟡' }; // Amarillo
@@ -242,4 +242,41 @@
             return (
               <div className="min-h-screen bg-slate-50 flex items-center justify-center">
                 <div className="text-center fade-in">
-                  <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600
+                  <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-slate-600 font-semibold">Cargando sistema...</p>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+              <header className="bg-white border-b border-slate-200 shadow-sm">
+                <div className="max-w-7xl mx-auto px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
+                          <Phone />
+                        </div>
+                        <div>
+                          <h1 className="text-2xl font-bold text-slate-900">112 Valencia</h1>
+                          <p className="text-sm text-slate-600">Sistema de Gestión de Emergencias</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2 text-slate-600">
+                        <Clock />
+                        <span className="text-sm font-medium">
+                          {currentTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium text-green-600">• Sistema Operativo</span>
+                      
+                      {discordUser && (
+                        <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-lg border border-slate-200">
+                          <img 
+                            src={`https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`}
+                            alt
