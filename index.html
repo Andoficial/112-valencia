@@ -131,7 +131,7 @@ const response=await fetch('https://discord.com/api/webhooks/1447737113683562559
 method:'POST',
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify({
-content:`${roleMention} ${priorityMention}\n\n⚠️ **NUEVA EMERGENCIA** ⚠️\n\n${prioridad.icon} **${prioridad.label}** (Nivel ${formData.nivel}/20)\n${servicio.emoji} **${servicio.value}**\n━━━━━━━━━━━━━━━━━━━━━`,
+content:`${roleMention}\n\n⚠️ **NUEVA EMERGENCIA** ⚠️\n\n${prioridad.icon} **${prioridad.label}** (Nivel ${formData.nivel}/20)\n${servicio.emoji} **${servicio.value}**\n━━━━━━━━━━━━━━━━━━━━━`,
 username:'Central 112 Valencia',
 avatar_url:'https://cdn-icons-png.flaticon.com/512/3588/3588592.png',
 embeds:[embed]
